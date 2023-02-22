@@ -9,6 +9,7 @@ pipeline{
         
         stage("Compile"){
             steps{
+              // sh "./gradlew clean" 
                sh "./gradlew compileJava" 
             }
         }
@@ -22,7 +23,6 @@ pipeline{
         stage("Code coverage"){
         	steps{
         		sh "./gradlew jacocoTestReport"
-                sh "ls build/reports/jacoco/test/html"
         		publishHTML (target: [
         			reportDir: 'build/reports/jacoco/test/html',
         			reportFiles: 'index.html',
