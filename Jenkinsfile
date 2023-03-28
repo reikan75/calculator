@@ -43,5 +43,36 @@ pipeline{
         		sh "./gradlew jacocoTestCoverageVerification"
         	}
         }
+        stage("Package"){
+            steps{
+                sh "./gradlew build"
+            }
+        }
+        stage("Docker build"){
+            steps{
+                sh "docker build -t reikan/calculator ."
+            }
+        }
+        stage("Docker push"){
+            steps{
+                sh "docker push reikan/calculator"
+            }
+        }
+        stage("Deploy to staging"){
+            steps{
+                sh "docker run -d --rm -p 8765:8080 --name calculator reikan/calculator"
+            }
+        }
+        stage("Acceptance test"){
+            steps{
+                sleep 60
+                sh "chmod +x acceptance_test.sh && ./acceptance_test.sh"
+            }
+        }
+        post{
+            always{
+                sh "docker stop calculator"
+            }
+        }
     }
 }
